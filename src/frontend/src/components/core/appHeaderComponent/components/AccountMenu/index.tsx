@@ -5,6 +5,7 @@ import { CustomFeedbackDialog } from "@/customization/components/custom-feedback
 import { CustomHeaderMenuItemsTitle } from "@/customization/components/custom-header-menu-items-title";
 import { CustomProfileIcon } from "@/customization/components/custom-profile-icon";
 import { ENABLE_DATASTAX_LANGFLOW } from "@/customization/feature-flags";
+import { IDE_VERSION } from "@/customization/feature-flags";
 import { useCustomNavigate } from "@/customization/hooks/use-custom-navigate";
 import useAuthStore from "@/stores/authStore";
 import { useDarkStore } from "@/stores/darkStore";
@@ -64,7 +65,7 @@ export const AccountMenu = () => {
                   data-testid="menu_version_button"
                   id="menu_version_button"
                 >
-                  Version {version}
+                  IDE Version {IDE_VERSION}
                 </span>
               </div>
               {!ENABLE_DATASTAX_LANGFLOW && <ThemeButtons />}
@@ -117,9 +118,9 @@ export const AccountMenu = () => {
                 />
               </>
             ) : (
-              <HeaderMenuItemLink newPage href="https://docs.langflow.org">
+              <HeaderMenuItemLink newPage href="https://docs.endless.link/endless/discovery/discovery-endless-protocol">
                 <span data-testid="menu_docs_button" id="menu_docs_button">
-                  Docs
+                  Endless Docs
                 </span>
               </HeaderMenuItemLink>
             )}
@@ -138,21 +139,21 @@ export const AccountMenu = () => {
             ) : (
               <HeaderMenuItemLink
                 newPage
-                href="https://github.com/langflow-ai/langflow/discussions"
+                href="https://github.com/endless-labs/"
               >
                 <span data-testid="menu_github_button" id="menu_github_button">
                   Share Feedback on Github
                 </span>
               </HeaderMenuItemLink>
             )}
-            <HeaderMenuItemLink newPage href="https://twitter.com/langflow_ai">
+            <HeaderMenuItemLink newPage href="https://x.com/EndlessProtocol">
               <span data-testid="menu_twitter_button" id="menu_twitter_button">
-                Follow Langflow on X
+                Follow Endless on X
               </span>
             </HeaderMenuItemLink>
-            <HeaderMenuItemLink newPage href="https://discord.gg/EqksyE2EX9">
+            <HeaderMenuItemLink newPage href="https://www.luffa.im/">
               <span data-testid="menu_discord_button" id="menu_discord_button">
-                Join the Langflow Discord
+                Explore Luffa
               </span>
             </HeaderMenuItemLink>
           </HeaderMenuItemsSection>

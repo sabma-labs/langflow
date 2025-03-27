@@ -1,13 +1,15 @@
 import AlertDropdown from "@/alerts/alertDropDown";
 import DataStaxLogo from "@/assets/DataStaxLogo.svg?react";
-import LangflowLogo from "@/assets/LangflowLogo.svg?react";
+import LangflowLogo from "@/assets/endlesslogo.svg?react";  // icon_top_banner
+import Endlesstext from "@/assets/endlesstext.svg?react";  // endlesstext
+import SurreyxEndless from "@/assets/surreyxendless.svg?react";  // surreyxendless
 import ForwardedIconComponent from "@/components/common/genericIconComponent";
 import ShadTooltip from "@/components/common/shadTooltipComponent";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { CustomOrgSelector } from "@/customization/components/custom-org-selector";
 import { CustomProductSelector } from "@/customization/components/custom-product-selector";
-import { ENABLE_DATASTAX_LANGFLOW } from "@/customization/feature-flags";
+import { ENABLE_DATASTAX_LANGFLOW, ENABLE_LANGFLOW_STORE } from "@/customization/feature-flags";
 import { useCustomNavigate } from "@/customization/hooks/use-custom-navigate";
 import useTheme from "@/customization/hooks/use-custom-theme";
 import { useResetDismissUpdateAll } from "@/hooks/use-reset-dismiss-update-all";
@@ -48,24 +50,29 @@ export default function AppHeader(): JSX.Element {
 
   return (
     <div
-      className="flex h-[62px] w-full items-center justify-between gap-2 border-b px-5 py-2.5 dark:bg-background"
+      className="flex h-[50px] w-full items-center justify-between gap-2 border-b px-5 py-2.5 dark:bg-background"
       data-testid="app-header"
     >
       {/* Left Section */}
       <div
-        className={`z-30 flex items-center gap-2`}
+        className={`z-40 flex items-center gap-2`}
         data-testid="header_left_section_wrapper"
       >
         <Button
           unstyled
           onClick={() => navigate("/")}
-          className="mr-1 flex h-8 w-8 items-center"
+          className="mr-1 flex h-6 w-35 items-center"
           data-testid="icon-ChevronLeft"
         >
           {ENABLE_DATASTAX_LANGFLOW ? (
             <DataStaxLogo className="fill-black dark:fill-[white]" />
           ) : (
-            <LangflowLogo className="h-5 w-6" />
+            <span className="flex items-center gap-2">
+            <SurreyxEndless className="h-8 w-35" />
+            {/* <Endlesstext className="h-5 w-20" /> */}
+            <span className="text-xl font-medium text-primary font-mono">Lab</span>
+          </span>
+
           )}
         </Button>
         {ENABLE_DATASTAX_LANGFLOW && (
@@ -136,7 +143,7 @@ export default function AppHeader(): JSX.Element {
             </AlertDropdown>
           </ShadTooltip>
         </AlertDropdown>
-        {!ENABLE_DATASTAX_LANGFLOW && (
+        {ENABLE_LANGFLOW_STORE && (
           <>
             <ShadTooltip
               content="Go to Langflow Store"

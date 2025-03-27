@@ -1,4 +1,4 @@
-import LangflowLogo from "@/assets/LangflowLogo.svg?react";
+import LangflowLogo from "@/assets/endlesslogo.svg?react";
 
 export default function LogoIcon() {
   return (

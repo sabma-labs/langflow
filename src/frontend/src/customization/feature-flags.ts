@@ -1,8 +1,8 @@
 export const ENABLE_DARK_MODE = true;
 export const ENABLE_API = true;
-export const ENABLE_LANGFLOW_STORE = true;
+export const ENABLE_LANGFLOW_STORE = false;
 export const ENABLE_PROFILE_ICONS = true;
-export const ENABLE_SOCIAL_LINKS = true;
+export const ENABLE_SOCIAL_LINKS = false;
 export const ENABLE_BRANDING = true;
 export const ENABLE_MVPS = false;
 export const ENABLE_CUSTOM_PARAM = false;
@@ -12,3 +12,5 @@ export const ENABLE_FILE_MANAGEMENT = true;
 export const ENABLE_PUBLISH = true;
 export const ENABLE_WIDGET = true;
 export const ENABLE_VOICE_ASSISTANT = true;
+export const ENABLE_GITHUB = false;
+export const IDE_VERSION = "0.1.4";

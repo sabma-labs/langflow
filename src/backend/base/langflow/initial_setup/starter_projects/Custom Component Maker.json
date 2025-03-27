@@ -2329,7 +2329,7 @@
       "zoom": 0.46721297887336727
     }
   },
-  "description": "Generates well-structured code for custom components following Langflow's specifications.",
+  "description": "Generates well-structured code for custom components following Endless's specifications.",
   "endpoint_name": null,
   "id": "4e7e8184-1a8c-4e04-ae99-b9c9ba48be53",
   "is_component": false,
