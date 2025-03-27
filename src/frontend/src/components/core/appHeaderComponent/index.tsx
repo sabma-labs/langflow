@@ -65,7 +65,7 @@ export default function AppHeader(): JSX.Element {
           data-testid="icon-ChevronLeft"
         >
             <span className="flex items-center gap-2">
-            <SurreyxEndless className="h-8 w-35 fill-green" />
+            <SurreyxEndless className="h-8 w-35 fill-black dark:fill-[white]" />
             {/* <Endlesstext className="h-5 w-20" /> */}
             <span className="text-xl font-medium text-primary font-mono">Lab</span>
           </span>
