@@ -18,7 +18,7 @@ export default function NewFlowCardComponent() {
     addFlow({ new_blank: true }).then((id) => {
       navigate(`/flow/${id}${folderId ? `/folder/${folderId}` : ""}`);
     });
-    track("New Flow Created", { template: "Blank Flow" });
+    track("New Flow Created", { template: "Blank Canvas" });
   };
 
   return (
@@ -31,7 +31,7 @@ export default function NewFlowCardComponent() {
         <div className="flex h-full w-full flex-col items-center justify-center rounded-md bg-muted align-middle bg-dotted-spacing-6 bg-dotted-muted-foreground bg-dotted-radius-px"></div>
       </CardContent>
       <CardDescription className="px-6 pb-4">
-        <CardTitle className="text-lg text-primary">Blank Flow</CardTitle>
+        <CardTitle className="text-lg text-primary">Blank Canvas</CardTitle>
       </CardDescription>
     </Card>
   );

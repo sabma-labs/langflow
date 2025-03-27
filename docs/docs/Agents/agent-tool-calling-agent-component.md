@@ -23,7 +23,7 @@ Learn how to build a flow starting with the **Tool calling agent** component, an
 
 Create a problem-solving agent in Langflow, starting with the **Tool calling agent**.
 
-1. Click **New Flow**, and then click **Blank Flow**.
+1. Click **New Flow**, and then click **Blank canvas**.
 2. Click and drag an **Agent** component to your workspace.
 The default settings are acceptable for now, so this guide assumes you're using **Open AI** for the LLM.
 3. Add your **Open AI API Key** to the **Agent** component.
@@ -133,16 +133,16 @@ class TextAnalyzerComponent(Component):
 
     def analyze_text(self) -> Data:
         text = self.input_text
-        
+
         # Perform text analysis
         word_count = len(text.split())
         char_count = len(text)
         sentence_count = len(re.findall(r'\w+[.!?]', text))
-        
+
         # Transform text
         reversed_text = text[::-1]
         uppercase_text = text.upper()
-        
+
         analysis_result = {
             "original_text": text,
             "word_count": word_count,
@@ -151,7 +151,7 @@ class TextAnalyzerComponent(Component):
             "reversed_text": reversed_text,
             "uppercase_text": uppercase_text
         }
-        
+
         data = Data(value=analysis_result)
         self.status = data
         return data

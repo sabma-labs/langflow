@@ -81,7 +81,7 @@ export default function TemplatesModal({
                   <div className="flex flex-col items-start justify-center">
                     <div className="font-semibold">Start from scratch</div>
                     <div className="text-sm text-muted-foreground">
-                      Begin with a fresh flow to build from scratch.
+                      Begin with a fresh canvas to build from scratch.
                     </div>
                   </div>
                   <Button
@@ -91,7 +91,7 @@ export default function TemplatesModal({
                           `/flow/${id}${folderId ? `/folder/${folderId}` : ""}`,
                         );
                       });
-                      track("New Flow Created", { template: "Blank Flow" });
+                      track("New Flow Created", { template: "Blank Canvas" });
                     }}
                     size="sm"
                     data-testid="blank-flow"
@@ -101,7 +101,7 @@ export default function TemplatesModal({
                       name="Plus"
                       className="h-4 w-4 shrink-0"
                     />
-                    Blank Flow
+                    Blank Canvas
                   </Button>
                 </div>
               </BaseModal.Footer>

@@ -8,7 +8,7 @@ test(
     await awaitBootstrapTest(page);
 
     expect(page.getByText("Start from scratch", { exact: true })).toBeVisible();
-    expect(page.getByRole("button", { name: "Blank Flow" })).toBeVisible();
+    expect(page.getByRole("button", { name: "Blank Canvas" })).toBeVisible();
 
     await page.getByTestId("side_nav_options_all-templates").click();
     await page.waitForSelector('[data-testid="search-input-template"]', {
