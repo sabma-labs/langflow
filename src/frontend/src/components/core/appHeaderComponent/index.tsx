@@ -64,16 +64,12 @@ export default function AppHeader(): JSX.Element {
           className="mr-1 flex h-6 w-35 items-center"
           data-testid="icon-ChevronLeft"
         >
-          {ENABLE_DATASTAX_LANGFLOW ? (
-            <DataStaxLogo className="fill-black dark:fill-[white]" />
-          ) : (
             <span className="flex items-center gap-2">
-            <SurreyxEndless className="h-8 w-35" />
+            <SurreyxEndless className="h-8 w-35 fill-green" />
             {/* <Endlesstext className="h-5 w-20" /> */}
             <span className="text-xl font-medium text-primary font-mono">Lab</span>
           </span>
 
-          )}
         </Button>
         {ENABLE_DATASTAX_LANGFLOW && (
           <>
