@@ -74,7 +74,7 @@ sk-...
 </Tabs>
 Export the generated API key as an environment variable.
 ```text
-export LANGFLOW_API_KEY="sk-..."
+export ENDLESS_API_KEY="sk-..."
 ```
 
 ## Base
@@ -506,7 +506,7 @@ curl -X POST \
   "$LANGFLOW_URL/api/v1/build/$FLOW_ID/flow" \
   -H "accept: application/json" \
   -H "Content-Type: application/json" \
-  -H "x-api-key: $LANGFLOW_API_KEY" \
+  -H "x-api-key: $ENDLESS_API_KEY" \
   -d '{"stop_component_id": "OpenAIModel-Uksag"}'
 ```
 

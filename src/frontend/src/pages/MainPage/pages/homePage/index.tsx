@@ -15,6 +15,7 @@ import ListSkeleton from "../../components/listSkeleton";
 import ModalsComponent from "../../components/modalsComponent";
 import useFileDrop from "../../hooks/use-on-file-drop";
 import EmptyFolder from "../emptyFolder";
+import StarryBackground from "@/components/visual/StarryBackground";
 
 const HomePage = ({ type }) => {
   const [view, setView] = useState<"grid" | "list">(() => {
@@ -93,6 +94,8 @@ const HomePage = ({ type }) => {
   }, [isEmptyFolder]);
 
   return (
+    <>
+
     <CardsWrapComponent
       onFileDrop={handleFileDrop}
       dragMessage={`Drop your ${isEmptyFolder ? "flows or components" : flowType} here`}
@@ -201,6 +204,8 @@ const HomePage = ({ type }) => {
         handleDeleteFolder={() => {}}
       />
     </CardsWrapComponent>
+    <StarryBackground />
+    </>
   );
 };
 

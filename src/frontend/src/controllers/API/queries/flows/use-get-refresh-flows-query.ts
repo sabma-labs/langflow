@@ -23,6 +23,8 @@ interface GetFlowsParams {
   size?: number;
 }
 
+
+const isLoggedIn = typeof document !== "undefined" && document.cookie.includes("access_token_lf");
 const addQueryParams = (url: string, params: GetFlowsParams): string => {
   return buildQueryStringUrl(url, params);
 };
@@ -74,9 +76,9 @@ export const useGetRefreshFlowsQuery: useQueryFunctionType<
 
       return [];
     } catch (e) {
-      setErrorData({
-        title: "Could not load flows from database",
-      });
+      //setErrorData({
+      //  title: "Could not load flows from database",
+      //});
       throw e;
     }
   };

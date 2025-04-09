@@ -28,7 +28,7 @@ const MouseTrailMask = () => {
           <circle
             key={index}
             cx={pos.x}
-            cy={pos.y-60}
+            cy={pos.y}
             r={radius}
             fill="black"
             fillOpacity={opacity * 0.6}
