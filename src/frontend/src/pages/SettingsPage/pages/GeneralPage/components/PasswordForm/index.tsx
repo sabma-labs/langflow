@@ -34,7 +34,7 @@ const PasswordFormComponent = ({
           event.preventDefault();
         }}
       >
-        <Card x-chunk="dashboard-04-chunk-2">
+        {/* <Card x-chunk="dashboard-04-chunk-2">
           <CardHeader>
             <CardTitle>Password</CardTitle>
             <CardDescription>
@@ -85,7 +85,7 @@ const PasswordFormComponent = ({
               <Button type="submit">Save</Button>
             </Form.Submit>
           </CardFooter>
-        </Card>
+        </Card> */}
       </Form.Root>
     </>
   );

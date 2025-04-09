@@ -1,3 +1,3 @@
-export const LangflowButtonRedirectTarget = () => {
-  return "https://langflow.org";
+export const EndlessButtonRedirectTarget = () => {
+  return "https://endless.link/";
 };

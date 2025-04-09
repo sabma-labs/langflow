@@ -23,7 +23,7 @@ Learn how to build a flow starting with the **Tool calling agent** component, an
 
 Create a problem-solving agent in Langflow, starting with the **Tool calling agent**.
 
-1. Click **New Flow**, and then click **Blank canvas**.
+1. Click **New Flow**, and then click **Blank Flow**.
 2. Click and drag an **Agent** component to your workspace.
 The default settings are acceptable for now, so this guide assumes you're using **Open AI** for the LLM.
 3. Add your **Open AI API Key** to the **Agent** component.

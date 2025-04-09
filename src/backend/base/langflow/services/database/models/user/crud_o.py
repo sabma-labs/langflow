@@ -1,4 +1,3 @@
-import uuid
 from datetime import datetime, timezone
 from uuid import UUID
 
@@ -27,6 +26,10 @@ async def get_user_by_id(db: AsyncSession, user_id: UUID) -> User | None:
 async def update_user(user_db: User | None, user: UserUpdate, db: AsyncSession) -> User:
     if not user_db:
         raise HTTPException(status_code=404, detail="User not found")
+
+    # user_db_by_username = get_user_by_username(db, user.username)
+    # if user_db_by_username and user_db_by_username.id != user_id:
+    #     raise HTTPException(status_code=409, detail="Username already exists")
 
     user_data = user.model_dump(exclude_unset=True)
     changed = False
@@ -57,51 +60,3 @@ async def update_user_last_login_at(user_id: UUID, db: AsyncSession):
         return await update_user(user, user_data, db)
     except Exception as e:  # noqa: BLE001
         logger.error(f"Error updating user last login at: {e!s}")
-
-
-async def create_user(
-    db: AsyncSession,
-    username: str,
-    password: str,
-    *,
-    email: str | None = None,
-    is_active: bool = True,
-    is_superuser: bool = False,
-) -> User:
-    from langflow.services.auth.utils import get_password_hash
-
-    hashed_password = get_password_hash(password)
-    user = User(
-        username=username,
-        password=hashed_password,
-        email=email,
-        is_active=is_active,
-        is_superuser=is_superuser,
-    )
-
-    db.add(user)
-    try:
-        await db.commit()
-    except IntegrityError as e:
-        await db.rollback()
-        raise HTTPException(status_code=400, detail="User already exists.") from e
-    return user
-
-
-async def get_user_by_address_or_create(address: str, db: AsyncSession) -> User:
-    result = await db.execute(select(User).where(User.username == address))
-    # print(f"Result: {result}")
-    user = result.scalar_one_or_none()
-
-    if user:
-        return user
-
-    # Create a new user with the address as username
-    return await create_user(
-        db=db,
-        username=address,
-        password=uuid.uuid4().hex,
-        email=f"{address}@wallet.local",
-        is_active=True,
-        is_superuser=False,
-    )

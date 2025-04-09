@@ -13,4 +13,4 @@ export const ENABLE_PUBLISH = true;
 export const ENABLE_WIDGET = true;
 export const ENABLE_VOICE_ASSISTANT = true;
 export const ENABLE_GITHUB = false;
-export const IDE_VERSION = "0.1.4";
+export const IDE_VERSION = "0.1.7";

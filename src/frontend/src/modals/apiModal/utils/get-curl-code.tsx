@@ -106,8 +106,8 @@ export function getNewCurlCode({
   return `${
     isAuthenticated
       ? `# Get API key from environment variable
-if [ -z "$LANGFLOW_API_KEY" ]; then
-  echo "Error: LANGFLOW_API_KEY environment variable not found. Please set your API key in the environment variables."
+if [ -z "$ENDLESS_API_KEY" ]; then
+  echo "Error: ENDLESS_API_KEY environment variable not found. Please set your API key in the environment variables."
 fi
 `
       : ""
@@ -116,7 +116,7 @@ fi
   --header 'Content-Type: application/json' \\${
     isAuthenticated
       ? `
-  --header "x-api-key: $LANGFLOW_API_KEY" \\`
+  --header "x-api-key: $ENDLESS_API_KEY" \\`
       : ""
   }
   --data '${JSON.stringify(payload, null, 2)}'`;

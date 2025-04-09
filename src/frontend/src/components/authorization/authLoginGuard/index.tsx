@@ -12,7 +12,7 @@ export const ProtectedLoginRoute = ({ children }) => {
     if (redirectPath) {
       return <CustomNavigate to={redirectPath} replace />;
     }
-    return <CustomNavigate to="/home" replace />;
+    // return <CustomNavigate to="/home" replace />;
   }
 
   return children;

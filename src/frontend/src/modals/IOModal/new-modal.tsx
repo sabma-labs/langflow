@@ -8,12 +8,12 @@ import {
 } from "@/controllers/API/queries/messages";
 import { ENABLE_PUBLISH } from "@/customization/feature-flags";
 import { track } from "@/customization/utils/analytics";
-import { LangflowButtonRedirectTarget } from "@/customization/utils/urls";
+import { EndlessButtonRedirectTarget } from "@/customization/utils/urls";
 import { useUtilityStore } from "@/stores/utilityStore";
 import { swatchColors } from "@/utils/styleUtils";
 import { useCallback, useEffect, useState } from "react";
 import { v5 as uuidv5 } from "uuid";
-import LangflowLogoColor from "../../assets/LangflowLogoColor.svg?react";
+import Surreyxendlesslogo from "@/assets/SurreyxEndlesslogo.svg?react";
 import IconComponent from "../../components/common/genericIconComponent";
 import ShadTooltip from "../../components/common/shadTooltipComponent";
 import { Button } from "../../components/ui/button";
@@ -264,9 +264,9 @@ export default function IOModal({
 
   const showPublishOptions = playgroundPage && ENABLE_PUBLISH;
 
-  const LangflowButtonClick = () => {
-    track("LangflowButtonClick");
-    window.open(LangflowButtonRedirectTarget(), "_blank");
+  const EndlessButtonClick = () => {
+    track("EndlessButtonClick");
+    window.open(EndlessButtonRedirectTarget(), "_blank");
   };
 
   useEffect(() => {
@@ -359,17 +359,17 @@ export default function IOModal({
                 )}
                 {sidebarOpen && showPublishOptions && (
                   <div className="absolute bottom-2 left-0 flex w-full flex-col gap-8 border-t border-border px-2 py-4 transition-all">
-                    <div className="flex items-center justify-between px-2">
+                    {/* <div className="flex items-center justify-between px-2">
                       <div className="text-sm">Theme</div>
                       <ThemeButtons />
-                    </div>
+                    </div> */}
                     <Button
-                      onClick={LangflowButtonClick}
+                      onClick={EndlessButtonClick}
                       variant="primary"
                       className="w-full !rounded-xl shadow-lg"
                     >
-                      <LangflowLogoColor />
-                      <div className="text-sm">Built with Langflow</div>
+                      <Surreyxendlesslogo />
+                      <div className="text-sm">Built with Endless</div>
                     </Button>
                   </div>
                 )}
@@ -380,14 +380,14 @@ export default function IOModal({
                 <ShadTooltip
                   styleClasses="z-50"
                   side="right"
-                  content="Built with Langflow"
+                  content="Built with Endless"
                 >
                   <Button
                     variant="primary"
                     className="h-12 w-12 !rounded-xl !p-4 shadow-lg"
-                    onClick={LangflowButtonClick}
+                    onClick={EndlessButtonClick}
                   >
-                    <LangflowLogoColor className="h-[18px] w-[18px] scale-150" />
+                    <Surreyxendlesslogo className="h-[18px] w-[36px] scale-150" />
                   </Button>
                 </ShadTooltip>
               </div>
