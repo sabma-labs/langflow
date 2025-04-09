@@ -67,6 +67,10 @@ const router = createBrowserRouter(
       }
     >
       <Route path="" element={<AppInitPage />}>
+        <Route
+          index
+          element={<CustomNavigate replace to="login" />}
+        />
         <Route path="" element={<AppWrapperPage />}>
           <Route
             path=""
