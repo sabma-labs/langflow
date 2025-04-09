@@ -91,7 +91,7 @@ export default function TemplatesModal({
                           `/flow/${id}${folderId ? `/folder/${folderId}` : ""}`,
                         );
                       });
-                      track("New Flow Created", { template: "Blank Canvas" });
+                      track("New Flow Created", { template: "Blank Flow" });
                     }}
                     size="sm"
                     data-testid="blank-flow"
@@ -101,7 +101,7 @@ export default function TemplatesModal({
                       name="Plus"
                       className="h-4 w-4 shrink-0"
                     />
-                    Blank Canvas
+                    Blank Flow
                   </Button>
                 </div>
               </BaseModal.Footer>

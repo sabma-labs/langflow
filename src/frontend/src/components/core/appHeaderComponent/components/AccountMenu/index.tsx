@@ -39,6 +39,7 @@ export const AccountMenu = () => {
 
   const handleLogout = () => {
     mutationLogout();
+    navigate("/login");
   };
 
   return (

@@ -12,6 +12,7 @@ import MouseTrailMask from "@/components/common/effects/MouseTrailMask";
 //import ParticleColumn from "@/components/visual/ParticleColumn";
 //import CodeRain from "@/components/visual/CodeRain";
 import { IDE_VERSION } from "@/customization/feature-flags";
+import { useNavigate } from "react-router-dom";
 
 type EmptyPageProps = {
   setOpenModal: (open: boolean) => void;
@@ -21,7 +22,7 @@ export const EmptyPage = ({ setOpenModal }: EmptyPageProps) => {
   const folders = useFolderStore((state) => state.folders);
   const handleFileDrop = useFileDrop(undefined);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-
+  const navigate = useNavigate();
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       setMousePos({ x: e.clientX, y: e.clientY });
@@ -38,7 +39,22 @@ export const EmptyPage = ({ setOpenModal }: EmptyPageProps) => {
     >
       <div className="m-0 h-full w-full bg-black relative overflow-hidden">
         {/* 背景图层 + 点阵 + 模糊遮罩 */}
-
+        <div className="absolute top-6 right-6 z-20">
+        <Button
+          variant="outline"
+          className="text-white border-white border bg-transparent hover:bg-white/10 backdrop-blur"
+          onClick={() => navigate("/login")}
+        >
+          Login
+        </Button>
+        <Button
+  variant="outline"
+  className="ml-2 text-white border-white border bg-transparent hover:bg-white/10 backdrop-blur"
+  onClick={() => navigate("/signup")}
+>
+  SignUp
+</Button>
+      </div>
 
         <svg
           width="100%"
