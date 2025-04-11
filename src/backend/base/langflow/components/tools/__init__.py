@@ -34,6 +34,7 @@ from .yahoo_finance import YfinanceToolComponent
 from .telegram_messenger import TelegramMessengerComponent
 from .scheduler import SchedulerComponent
 from .get_weather import GetWeatherComponent
+from .token_price_query import TokenPriceComponent
 
 with warnings.catch_warnings():
     warnings.simplefilter("ignore", LangChainDeprecationWarning)
@@ -74,5 +75,6 @@ __all__ = [
     "YfinanceToolComponent",
     "TelegramMessengerComponent",
     "SchedulerComponent",
-    "GetWeatherComponent"
+    "GetWeatherComponent",
+    "TokenPriceComponent"
 ]
