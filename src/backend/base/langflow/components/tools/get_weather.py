@@ -24,7 +24,7 @@ class GetWeatherComponent(Component):
             value="api_key",
             required=True,
         ),
-        MessageInput(
+        StrInput(
             name="city",
             display_name="City",
             info="Specify the name of the city.",

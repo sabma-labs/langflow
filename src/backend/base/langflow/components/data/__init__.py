@@ -7,9 +7,6 @@ from .s3_bucket_uploader import S3BucketUploaderComponent
 from .sql_executor import SQLExecutorComponent
 from .url import URLComponent
 from .webhook import WebhookComponent
-from .luffa_messenger import LuffaMessengerComponent
-from .get_weather import GetWeatherComponent
-from .telegram_messenger import TelegramMessengerComponent
 
 __all__ = [
     "APIRequestComponent",
@@ -21,7 +18,4 @@ __all__ = [
     "SQLExecutorComponent",
     "URLComponent",
     "WebhookComponent",
-    "LuffaMessengerComponent",
-    "GetWeatherComponent",
-    "TelegramMessengerComponent",
 ]

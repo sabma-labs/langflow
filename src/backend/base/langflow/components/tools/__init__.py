@@ -31,6 +31,9 @@ from .wikipedia_api import WikipediaAPIComponent
 from .wolfram_alpha_api import WolframAlphaAPIComponent
 from .yahoo import YfinanceComponent
 from .yahoo_finance import YfinanceToolComponent
+from .telegram_messenger import TelegramMessengerComponent
+from .scheduler import SchedulerComponent
+from .get_weather import GetWeatherComponent
 
 with warnings.catch_warnings():
     warnings.simplefilter("ignore", LangChainDeprecationWarning)
@@ -69,4 +72,7 @@ __all__ = [
     "WolframAlphaAPIComponent",
     "YfinanceComponent",
     "YfinanceToolComponent",
+    "TelegramMessengerComponent",
+    "SchedulerComponent",
+    "GetWeatherComponent"
 ]

@@ -6,26 +6,35 @@ from langflow.inputs import DropdownInput, MultilineInput, SecretStrInput, StrIn
 from langflow.io import Output
 from langflow.schema import Data
 
-class TelegramMessengerComponent(Component):
-    display_name = "Telegram Messenger"
-    description = "Send Telegram messages"
-    icon = "check-check"
-    name = "TelegramMessenger"
+class LuffaMessengerComponent(Component):
+    display_name = "Luffa Messenger"
+    description = "Send Luffa messages"
+    icon = "message-square-reply"
+    name = "LuffaMessenger"
     # legacy = True
 
     inputs = [
         SecretStrInput(
-            name="token",
-            display_name="Telegram bot token",
-            info="The token of the bot that will be used",
+            name="secret",
+            display_name="Luffa bot secret",
+            info="The secret of the bot that will be used",
             advanced=False,
-            value="",
+            value="SECRET",
             required=True,
         ),
-        MessageInput(
-            name="chat_id",
-            display_name="Chat ID",
-            info="Enter the chat id of the message recipient.",
+        DropdownInput(
+            name="target_type",
+            display_name="Target Type",
+            options=["User", "Group"],
+            info="Select whether the target is a user or a group.",
+            real_time_refresh=True,
+            advanced=False,
+            tool_mode=True,
+        ),
+        StrInput(
+            name="target_id",
+            display_name="Target ID",
+            info="Enter the user ID or group ID of the message recipient.",
             value="",
             tool_mode=True,
             advanced=False,
@@ -36,6 +45,7 @@ class TelegramMessengerComponent(Component):
             info="Message text",
             value="",
             advanced=False,
+            tool_mode=True,
         ),
     ]
 
@@ -43,18 +53,25 @@ class TelegramMessengerComponent(Component):
         Output(display_name="Data", name="data", method="send_handler"),
     ]
 
+    endpoint = "https://apibot.luffa.im/robot"
+
     async def send_handler(self) -> Data:
-        url = f"https://api.telegram.org/bot{self.token}/sendMessage"
+        if self.target_type == "Group":
+            url = f"{self.endpoint}/sendGroup"
+        else:
+            url = f"{self.endpoint}/send"
 
         headers = {"Content-Type": "application/json"}
         data = {
-            "chat_id": self.chat_id,
-            "text": self.message,
+            "secret": self.secret,
+            "uid": self.target_id,
+            "msg": json.dumps({ "text": self.message }),
         }
 
-        print(self.chat_id)
+        print(self.endpoint)
+        print(self.target_id)
         print(self.message)
-        print(f"url: {url}, target_id: {self.chat_id}, message: {self.message}")
+        print(f"url: {url}, target_id: {self.target_id}, message: {self.message}")
 
         try:
             response = requests.post(url, headers=headers, json=data)
