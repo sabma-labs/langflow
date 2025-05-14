@@ -259,27 +259,51 @@ async def process_agent_events(
     send_message_method: SendMessageFunctionType,
 ) -> Message:
     """Process agent events and return the final output."""
+    # Debug: Starting event processing
+    # print("[DEBUG] Entered process_agent_events")
+    # Set initial properties to partial
     if isinstance(agent_message.properties, dict):
         agent_message.properties.update({"icon": "Bot", "state": "partial"})
     else:
         agent_message.properties.icon = "Bot"
         agent_message.properties.state = "partial"
+    # print(f"[DEBUG] Initial agent_message properties: {agent_message.properties}")
+
     # Store the initial message
     agent_message = await send_message_method(message=agent_message)
+    # print(f"[DEBUG] Sent initial message with id: {getattr(agent_message, 'id', 'unknown')}")
     try:
         # Create a mapping of run_ids to tool contents
         tool_blocks_map: dict[str, ToolContent] = {}
         start_time = perf_counter()
+        # print("[DEBUG] Starting event loop")
         async for event in agent_executor:
+            # print(f"[DEBUG] Received event: {event['event']}")
             if event["event"] in TOOL_EVENT_HANDLERS:
                 tool_handler = TOOL_EVENT_HANDLERS[event["event"]]
+                # print(f"[DEBUG] Handling tool event: {event['event']}")
                 agent_message, start_time = await tool_handler(
                     event, agent_message, tool_blocks_map, send_message_method, start_time
                 )
+                # print(f"[DEBUG] Updated message after tool event: {event['event']}")
+                # print(f"[DEBUG] TOOL HANDLER from agent_message: {agent_message}")
+
             elif event["event"] in CHAIN_EVENT_HANDLERS:
                 chain_handler = CHAIN_EVENT_HANDLERS[event["event"]]
-                agent_message, start_time = await chain_handler(event, agent_message, send_message_method, start_time)
+                # print(f"[DEBUG] Handling chain event: {event['event']}")
+                agent_message, start_time = await chain_handler(
+                    event, agent_message, send_message_method, start_time
+                )
+                # print(f"[DEBUG] CHAIN HANDLER from agent_message: {agent_message}")
+                # print(f"[DEBUG] Updated message after chain event: {event['event']}")
         agent_message.properties.state = "complete"
+        # print("[DEBUG] Event loop complete, marking message as complete")
     except Exception as e:
+        print(f"[ERROR] Exception in process_agent_events: {e}")
         raise ExceptionWithMessageError(agent_message, str(e)) from e
-    return await Message.create(**agent_message.model_dump())
+
+    # Debug: Final message being created
+    # print(f"[DEBUG] Creating final Message object from agent_message: {agent_message}")
+    final_message = await Message.create(**agent_message.model_dump())
+    # print(f"[DEBUG] Final message created with id: {getattr(final_message, 'id', 'unknown')}")
+    return final_message

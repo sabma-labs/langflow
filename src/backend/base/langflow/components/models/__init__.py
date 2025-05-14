@@ -22,6 +22,7 @@ from .sambanova import SambaNovaComponent
 from .vertexai import ChatVertexAIComponent
 from .watsonx import WatsonxAIComponent
 from .xai import XAIModelComponent
+from .stable_diffusion import StableDiffusionComponent
 
 __all__ = [
     "AIMLModelComponent",
@@ -48,4 +49,5 @@ __all__ = [
     "SambaNovaComponent",
     "WatsonxAIComponent",
     "XAIModelComponent",
+    "StableDiffusionComponent"
 ]

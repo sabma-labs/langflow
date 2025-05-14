@@ -1,3 +1,4 @@
+import re 
 from collections.abc import Generator
 from typing import Any
 
@@ -9,26 +10,31 @@ from langflow.schema.data import Data
 from langflow.schema.dataframe import DataFrame
 from langflow.schema.message import Message
 from langflow.schema.properties import Source
+from langflow.schema.content_types import MediaContent
 from langflow.utils.constants import (
     MESSAGE_SENDER_AI,
     MESSAGE_SENDER_NAME_AI,
     MESSAGE_SENDER_USER,
 )
 
-
 class ChatOutput(ChatComponent):
     display_name = "Chat Output"
-    description = "Display a chat message in the Playground."
+    description = "Display a chat message in the Playground. Supports base64 images."
     icon = "MessagesSquare"
     name = "ChatOutput"
     minimized = True
+    BASE64_REGEX = re.compile(
+        r"^(?:[A-Za-z0-9+/]{4})*"
+        r"(?:[A-Za-z0-9+/]{2}==|"
+        r"[A-Za-z0-9+/]{3}=)?$"
+    )
 
     inputs = [
         HandleInput(
             name="input_value",
-            display_name="Text",
-            info="Message to be passed as output.",
-            input_types=["Data", "DataFrame", "Message"],
+            display_name="Text or Base64 Image",
+            info="Message or base64 image data to be passed as output.",
+            input_types=["Data", "DataFrame", "Message", "str"],
             required=True,
         ),
         BoolInput(
@@ -92,6 +98,7 @@ class ChatOutput(ChatComponent):
             advanced=True,
         ),
     ]
+
     outputs = [
         Output(
             display_name="Message",
@@ -100,23 +107,49 @@ class ChatOutput(ChatComponent):
         ),
     ]
 
+    IMAGE_PREFIXES = (
+        "data:image/png;base64,", 
+        "data:image/jpeg;base64,", 
+        "data:image/gif;base64,"
+    )
+
     def _build_source(self, id_: str | None, display_name: str | None, source: str | None) -> Source:
+        print(f"[DEBUG] Building source with id: {id_}, display_name: {display_name}, source: {source}")
         source_dict = {}
         if id_:
             source_dict["id"] = id_
         if display_name:
             source_dict["display_name"] = display_name
         if source:
-            # Handle case where source is a ChatOpenAI object
             if hasattr(source, "model_name"):
                 source_dict["source"] = source.model_name
             elif hasattr(source, "model"):
                 source_dict["source"] = str(source.model)
             else:
                 source_dict["source"] = str(source)
+        print(f"[DEBUG] Final source_dict: {source_dict}")
         return Source(**source_dict)
 
     async def message_response(self) -> Message:
+        print("[DEBUG] Starting message_response...")
+        print(self.input_value)
+        # print(f"[DEBUG] Raw input_value: {self.input_value}")
+
+        # if isinstance(self.input_value, Message):
+        #     print("[DEBUG] Input is of type Message")
+        #     message = self.input_value
+
+        #     for block in getattr(message, "content_blocks", []) or []:
+        #         if block.title == "Agent Steps":
+        #             for piece in block.contents:
+        #                 if getattr(piece, "type", "") == "tool_use":
+        #                     uri = getattr(piece, "output", "")
+        #                     if isinstance(uri, str) and uri.startswith("data:image/"): 
+        #                         print("I am in block")                               
+        #                         message.set_text(uri)
+        #                         print(message.get_text())
+                                
+
         # First convert the input to string if needed
         text = self.convert_to_string()
         # Get source properties
@@ -133,51 +166,48 @@ class ChatOutput(ChatComponent):
             message.text = text
         else:
             message = Message(text=text)
+        source, icon, display_name, source_id = self.get_properties_from_source_component()
+        background_color = self.background_color
+        text_color = self.text_color
+        if self.chat_icon:
+            icon = self.chat_icon
 
-        # Set message properties
         message.sender = self.sender
         message.sender_name = self.sender_name
         message.session_id = self.session_id
-        message.flow_id = self.graph.flow_id if hasattr(self, "graph") else None
+        message.flow_id = getattr(self, 'graph', None) and self.graph.flow_id
         message.properties.source = self._build_source(source_id, display_name, source)
         message.properties.icon = icon
         message.properties.background_color = background_color
         message.properties.text_color = text_color
 
-        # Store message if needed
         if self.session_id and self.should_store_message:
-            stored_message = await self.send_message(message)
-            self.message.value = stored_message
-            message = stored_message
+            print("[DEBUG] Storing message in session...")
+            stored = await self.send_message(message)
+            self.message.value = stored
+            message = stored
+        else:
+            print("[DEBUG] Not storing message (session_id or flag missing).")
 
         self.status = message
+        print("[DEBUG] Returning final message object.")
         return message
 
     def _validate_input(self) -> None:
-        """Validate the input data and raise ValueError if invalid."""
+        print("[DEBUG] Validating input type...")
         if self.input_value is None:
-            msg = "Input data cannot be None"
-            raise ValueError(msg)
+            raise ValueError("Input data cannot be None")
         if isinstance(self.input_value, list) and not all(
-            isinstance(item, Message | Data | DataFrame | str) for item in self.input_value
+            isinstance(item, (Message, Data, DataFrame, str)) for item in self.input_value
         ):
-            invalid_types = [
-                type(item).__name__
-                for item in self.input_value
-                if not isinstance(item, Message | Data | DataFrame | str)
-            ]
-            msg = f"Expected Data or DataFrame or Message or str, got {invalid_types}"
-            raise TypeError(msg)
-        if not isinstance(
-            self.input_value,
-            Message | Data | DataFrame | str | list | Generator | type(None),
-        ):
-            type_name = type(self.input_value).__name__
-            msg = f"Expected Data or DataFrame or Message or str, Generator or None, got {type_name}"
-            raise TypeError(msg)
+            invalid = [type(item).__name__ for item in self.input_value if not isinstance(item, (Message, Data, DataFrame, str))]
+            raise TypeError(f"Expected Data, DataFrame, Message, or str, got {invalid}")
+        if not isinstance(self.input_value, (Message, Data, DataFrame, str, list, Generator, type(None))):
+            raise TypeError(f"Unexpected input type: {type(self.input_value).__name__}")
+        print("[DEBUG] Input validation passed.")
 
     def _safe_convert(self, data: Any) -> str:
-        """Safely convert input data to string."""
+        print(f"[DEBUG] Converting data: {data}")
         try:
             if isinstance(data, str):
                 return data
@@ -185,34 +215,32 @@ class ChatOutput(ChatComponent):
                 return data.get_text()
             if isinstance(data, Data):
                 if data.get_text() is None:
-                    msg = "Empty Data object"
-                    raise ValueError(msg)
+                    raise ValueError("Empty Data object")
                 return data.get_text()
             if isinstance(data, DataFrame):
                 if self.clean_data:
-                    # Remove empty rows
                     data = data.dropna(how="all")
-                    # Remove empty lines in each cell
                     data = data.replace(r"^\s*$", "", regex=True)
-                    # Replace multiple newlines with a single newline
                     data = data.replace(r"\n+", "\n", regex=True)
-
-                # Replace pipe characters to avoid markdown table issues
-                processed_data = data.replace(r"\|", r"\\|", regex=True)
-
-                processed_data = processed_data.map(
-                    lambda x: str(x).replace("\n", "<br/>") if isinstance(x, str) else x
-                )
-
-                return processed_data.to_markdown(index=False)
+                df = data.replace(r"\|", r"\\|", regex=True)
+                df = df.map(lambda x: str(x).replace("\n", "<br/>") if isinstance(x, str) else x)
+                return df.to_markdown(index=False)
             return str(data)
-        except (ValueError, TypeError, AttributeError) as e:
-            msg = f"Error converting data: {e!s}"
-            raise ValueError(msg) from e
+        except Exception as e:
+            print(f"[ERROR] Failed to convert data: {e}")
+            raise ValueError(f"Error converting data: {e}") from e
 
     def convert_to_string(self) -> str | Generator[Any, None, None]:
-        """Convert input data to string with proper error handling."""
+        print("[DEBUG] Starting convert_to_string...")
         self._validate_input()
+        # if isinstance(self.input_value, Message):
+        #     print("[DEBUG] Input is Message for conversion")
+        #     for block in getattr(self.input_value, "content_blocks", []) or self.input_value.data.get("content_blocks", []):
+        #         for piece in block.contents:
+        #             output = getattr(piece, "output", None) or piece.get("output")
+        #             if isinstance(output, str) and self.BASE64_REGEX.fullmatch(output):
+        #                 print("[DEBUG] Found base64 image in Message content_blocks")
+        #                 return output
         if isinstance(self.input_value, list):
             return "\n".join([self._safe_convert(item) for item in self.input_value])
         if isinstance(self.input_value, Generator):

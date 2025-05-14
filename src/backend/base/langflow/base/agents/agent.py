@@ -52,7 +52,7 @@ class LCAgentComponent(Component):
         IntInput(
             name="max_iterations",
             display_name="Max Iterations",
-            value=15,
+            value=2,
             advanced=True,
             info="The maximum number of attempts the agent can make to complete its task before it stops.",
         ),
@@ -122,6 +122,7 @@ class LCAgentComponent(Component):
         self,
         agent: Runnable | BaseSingleActionAgent | BaseMultiActionAgent | AgentExecutor,
     ) -> Message:
+        print(f"TOOLS: {self.tools}")
         if isinstance(agent, AgentExecutor):
             runnable = agent
         else:
@@ -241,6 +242,8 @@ class LCToolsAgentComponent(LCAgentComponent):
     async def to_toolkit(self) -> list[Tool]:
         component_toolkit = _get_component_toolkit()
         tools_names = self._build_tools_names()
+        print("this is backback 2 times")
+        print(tools_names)
         agent_description = self.get_tool_description()
         # TODO: Agent Description Depreciated Feature to be removed
         description = f"{agent_description}{tools_names}"
