@@ -123,6 +123,7 @@ dependencies = [
     "langchain-ibm>=0.3.8",
     "opik>=1.6.3",
     "apscheduler>=3.11.0",
+    "croniter>=1.3.0",
     "endless-sdk @ git+https://github.com/sabma-labs/endless-python-sdk",
 ]
 
