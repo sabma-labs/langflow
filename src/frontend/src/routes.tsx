@@ -23,6 +23,7 @@ import { AppWrapperPage } from "./pages/AppWrapperPage";
 import { DashboardWrapperPage } from "./pages/DashboardWrapperPage";
 import FlowPage from "./pages/FlowPage";
 import LoginPage from "./pages/LoginPage/index";
+import AuthorizationPage from "./pages/AuthorizationPage";
 import CollectionPage from "./pages/MainPage/pages";
 import FilesPage from "./pages/MainPage/pages/filesPage";
 import HomePage from "./pages/MainPage/pages/homePage";
@@ -42,12 +43,21 @@ import ParticleTest from "@/pages/ParticleTest";
 const AdminPage = lazy(() => import("./pages/AdminPage"));
 const LoginAdminPage = lazy(() => import("./pages/AdminPage/LoginPage"));
 const DeleteAccountPage = lazy(() => import("./pages/DeleteAccountPage"));
-
+const AuthorizationPage = lazy(() => import("./pages/AuthorizationPage"));
 const PlaygroundPage = lazy(() => import("./pages/Playground"));
 
 const SignUp = lazy(() => import("./pages/SignUpPage"));
 const router = createBrowserRouter(
+  
   createRoutesFromElements([
+    <Route
+      path="authorisation"
+      element={
+        <ContextWrapper>
+          <AuthorizationPage />
+        </ContextWrapper>
+      }
+    />,
     <Route path="/playground/:id/">
       <Route
         path=""

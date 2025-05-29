@@ -18,7 +18,7 @@ from langflow.utils.constants import (
 
 class ChatInput(ChatComponent):
     display_name = "Chat Input"
-    description = "Get chat inputs from the Playground."
+    description = "Get chat inputs from the Playground, including text and image."
     icon = "MessagesSquare"
     name = "ChatInput"
     minimized = True
@@ -28,8 +28,17 @@ class ChatInput(ChatComponent):
             name="input_value",
             display_name="Text",
             value="",
-            info="Message to be passed as input.",
+            info="Message text to be passed as input.",
             input_types=[],
+        ),
+        FileInput(
+            name="image",
+            display_name="Image",
+            file_types=IMG_FILE_TYPES,
+            info="Optional image to be passed as input.",
+            advanced=False,
+            is_list=False,
+            temp_file=True,
         ),
         BoolInput(
             name="should_store_message",
@@ -61,9 +70,9 @@ class ChatInput(ChatComponent):
         ),
         FileInput(
             name="files",
-            display_name="Files",
-            file_types=TEXT_FILE_TYPES + IMG_FILE_TYPES,
-            info="Files to be sent with the message.",
+            display_name="Attachments",
+            file_types=TEXT_FILE_TYPES,
+            info="Text files to be sent with the message.",
             advanced=True,
             is_list=True,
             temp_file=True,
@@ -92,26 +101,41 @@ class ChatInput(ChatComponent):
     ]
 
     async def message_response(self) -> Message:
+        """
+        Construct and send a Message object, including optional image and files.
+        """
+        print("Inside input Chat output")
+        # Collect styling properties
         background_color = self.background_color
         text_color = self.text_color
         icon = self.chat_icon
 
+        # Prepare attachments
+        attachments = []
+        if self.files:
+            # existing text attachments
+            attachments.extend(self.files)
+        if hasattr(self, 'image') and self.image:
+            # add the optional image
+            attachments.append(self.image)
+
+        # Create the message
         message = await Message.create(
             text=self.input_value,
             sender=self.sender,
             sender_name=self.sender_name,
             session_id=self.session_id,
-            files=self.files,
+            files=attachments,
             properties={
                 "background_color": background_color,
                 "text_color": text_color,
                 "icon": icon,
             },
         )
+
+        # Optionally store in history
         if self.session_id and isinstance(message, Message) and self.should_store_message:
-            stored_message = await self.send_message(
-                message,
-            )
+            stored_message = await self.send_message(message)
             self.message.value = stored_message
             message = stored_message
 

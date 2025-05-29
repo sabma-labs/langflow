@@ -185,7 +185,9 @@ async def wallet_login(
     address = data.get("address")
     signature = data.get("signature")
     full_message = data.get("fullMessage")
-
+    print(f"address: {address}")
+    print(f"signature: {signature}")
+    print(f"full_message: {full_message}")
     if not address or not signature or not full_message:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

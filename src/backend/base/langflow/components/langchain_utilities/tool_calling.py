@@ -58,9 +58,21 @@ class ToolCallingAgentComponent(LCToolsAgentComponent):
             raise NotImplementedError(message) from e
 
     async def to_toolkit(self) -> list[Tool]:
+        
         component_toolkit = _get_component_toolkit()
         toolkit = component_toolkit(component=self)
         tools = toolkit.get_tools(callbacks=self.get_langchain_callbacks())
+        print("I come to this agent(back)")
+        for tool in tools:
+            # 1) Log the tool so you can inspect its attributes
+            print(f"[DEBUG] Found tool: name={tool.name}, tool_name={getattr(tool, 'tool_name', None)}, description={tool.description}")
+            
+            # 2) Match on whichever field uniquely identifies your image tool
+            if tool.name == "StableDiffusion-generate":
+                print('INSIE STABLE ')
+                setattr(tool, "return_direct", True)
+            else:
+                setattr(tool, "return_direct", False)
         if hasattr(self, "tools_metadata"):
             tools = toolkit.update_tools_metadata(tools=tools)
         return tools

@@ -10,13 +10,14 @@ from langflow.schema.data import Data
 from langflow.schema.dataframe import DataFrame
 from langflow.schema.message import Message
 from langflow.schema.properties import Source
+from langflow.schema.content_block import ContentBlock
 from langflow.schema.content_types import MediaContent
 from langflow.utils.constants import (
     MESSAGE_SENDER_AI,
     MESSAGE_SENDER_NAME_AI,
     MESSAGE_SENDER_USER,
 )
-
+import ipdb
 class ChatOutput(ChatComponent):
     display_name = "Chat Output"
     description = "Display a chat message in the Playground. Supports base64 images."
@@ -133,39 +134,33 @@ class ChatOutput(ChatComponent):
     async def message_response(self) -> Message:
         print("[DEBUG] Starting message_response...")
         print(self.input_value)
-        # print(f"[DEBUG] Raw input_value: {self.input_value}")
-
-        # if isinstance(self.input_value, Message):
-        #     print("[DEBUG] Input is of type Message")
-        #     message = self.input_value
-
-        #     for block in getattr(message, "content_blocks", []) or []:
-        #         if block.title == "Agent Steps":
-        #             for piece in block.contents:
-        #                 if getattr(piece, "type", "") == "tool_use":
-        #                     uri = getattr(piece, "output", "")
-        #                     if isinstance(uri, str) and uri.startswith("data:image/"): 
-        #                         print("I am in block")                               
-        #                         message.set_text(uri)
-        #                         print(message.get_text())
-                                
-
-        # First convert the input to string if needed
-        text = self.convert_to_string()
-        # Get source properties
-        source, icon, display_name, source_id = self.get_properties_from_source_component()
-        background_color = self.background_color
-        text_color = self.text_color
-        if self.chat_icon:
-            icon = self.chat_icon
-
-        # Create or use existing Message object
-        if isinstance(self.input_value, Message):
-            message = self.input_value
-            # Update message properties
-            message.text = text
-        else:
-            message = Message(text=text)
+        self._validate_input()
+        auth_url, qr_data=self._qr_code_display()
+        if auth_url!= None and qr_data!=None:
+            message = Message(text=auth_url)  
+            # Overwrite the content_blocks with a single image block
+            message.content_blocks = [
+                ContentBlock(
+                    title="Media Block",
+                    contents=[
+                        MediaContent(
+                            type="media",  # Explicitly set the type
+                            urls=[qr_data],
+                            caption="Scan this QR code to authorize"
+                        )
+                    ]
+                )
+            ]
+        else:    
+            # First convert the input to string if needed
+            text = self.convert_to_string()
+            # Create or use existing Message object
+            if isinstance(self.input_value, Message):
+                message = self.input_value
+                # Update message properties
+                message.text = text
+            else:
+                message = Message(text=text)
         source, icon, display_name, source_id = self.get_properties_from_source_component()
         background_color = self.background_color
         text_color = self.text_color
@@ -232,17 +227,49 @@ class ChatOutput(ChatComponent):
 
     def convert_to_string(self) -> str | Generator[Any, None, None]:
         print("[DEBUG] Starting convert_to_string...")
-        self._validate_input()
-        # if isinstance(self.input_value, Message):
-        #     print("[DEBUG] Input is Message for conversion")
-        #     for block in getattr(self.input_value, "content_blocks", []) or self.input_value.data.get("content_blocks", []):
-        #         for piece in block.contents:
-        #             output = getattr(piece, "output", None) or piece.get("output")
-        #             if isinstance(output, str) and self.BASE64_REGEX.fullmatch(output):
-        #                 print("[DEBUG] Found base64 image in Message content_blocks")
-        #                 return output
         if isinstance(self.input_value, list):
             return "\n".join([self._safe_convert(item) for item in self.input_value])
         if isinstance(self.input_value, Generator):
             return self.input_value
         return self._safe_convert(self.input_value)
+
+    def _qr_code_display(self):
+        if isinstance(self.input_value, Data):
+            # get content_blocks either as attribute or from .data
+            blocks = getattr(self.input_value, "content_blocks", None) \
+                    or self.input_value.data.get("content_blocks", [])
+
+            for block in blocks:
+                # each block should have a .contents list
+                pieces = getattr(block, "contents", None) or block.get("contents", [])
+                for piece in pieces:
+                    # safely get the 'type' and 'name' fields
+                    piece_type = getattr(piece, "type", None) 
+                    piece_name = getattr(piece, "name", None) 
+
+                    if piece_type == "tool_use" and piece_name == "Create-NFT-Collection-create_nft_collection":
+                        # now grab the output
+                        output = getattr(piece, "output", None)
+                        if not output:
+                            print("[DEBUG] No output found on tool_use piece")
+                            return None, None
+
+                        # extract the values
+                        auth_url = output.get("authorization_url")
+                        qr_data = output.get("qr_code_image")
+
+                        # debug prints
+                        if auth_url:
+                            print(f"Authorization URL: {auth_url}")
+                        if qr_data:
+                            print("QR Code Image (data URI):")
+                            print(qr_data)
+
+                        return auth_url, qr_data
+
+            # if we finish loops without finding it
+            print("[DEBUG] No matching Create-NFT-Collection block found")
+        else:
+            print("[DEBUG] input_value is not a Data instance")
+
+        return None, None

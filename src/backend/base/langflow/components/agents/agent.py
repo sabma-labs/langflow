@@ -20,7 +20,7 @@ from langflow.logging import logger
 from langflow.schema.dotdict import dotdict
 from langflow.schema.message import Message
 
-
+import pdb
 def set_advanced_true(component_input):
     component_input.advanced = True
     return component_input
@@ -63,11 +63,19 @@ class AgentComponent(ToolCallingAgentComponent):
             info="If true, will add a tool to the agent that returns the current date.",
             value=True,
         ),
+        BoolInput(
+            name="return_direct",
+            display_name="Return Direct",
+            info="Return the result directly from the Tool.",
+            advanced=True,
+            value=True
+        )
     ]
     outputs = [Output(name="response", display_name="Response", method="message_response")]
 
     async def message_response(self) -> Message:
         try:
+            print("here in agent message_response")
             # Get LLM model and validate
             llm_model, display_name = self.get_llm()
             if llm_model is None:
@@ -92,7 +100,6 @@ class AgentComponent(ToolCallingAgentComponent):
             if not self.tools:
                 msg = "Tools are required to run the agent. Please add at least one tool."
                 raise ValueError(msg)
-
             # Set up and run agent
             self.set(
                 llm=llm_model,
@@ -102,7 +109,29 @@ class AgentComponent(ToolCallingAgentComponent):
                 system_prompt=self.system_prompt,
             )
             agent = self.create_agent_runnable()
-            return await self.run_agent(agent)
+             # run the agent and get the raw Message
+            result = await self.run_agent(agent)
+            # print(f"[DEBUG] Agent raw text before scan: {result.text!r}")
+            for block in (result.content_blocks or []):
+                # 1) Prefer an explicit media_url field on the block
+                uri = getattr(block, "media_url", None)
+                # 2) Fall back to any HTTP URL in the tool output
+                if not uri:
+                    for piece in block.contents:
+                        if getattr(piece, "type", "") in ("tool_output", "tool_use"):
+                            out = getattr(piece, "output", "")
+                            if isinstance(out, str) and (out.startswith("http://") or out.startswith("https://")):
+                                uri = out
+                                break
+                # 3) If we found an image URL, render it
+                if isinstance(uri, str) and (uri.startswith("http://") or uri.startswith("https://") or uri.startswith("data:image/")):
+                    result.text = f"![]({uri})"
+                    result.properties.allow_markdown = True
+                    break
+
+            # print(f"[DEBUG] Agent final text: {result.text!r}")
+            self.status = result
+            return result
 
         except (ValueError, TypeError, KeyError) as e:
             logger.error(f"{type(e).__name__}: {e!s}")
@@ -269,6 +298,8 @@ class AgentComponent(ToolCallingAgentComponent):
                     build_config = await update_component_build_config(
                         component_class, build_config, field_value, "model_name"
                     )
+        if field_name == "return_direct":
+            build_config["return_direct"] = bool(field_value)
         return dotdict({k: v.to_dict() if hasattr(v, "to_dict") else v for k, v in build_config.items()})
 
     async def to_toolkit(self) -> list[Tool]:
@@ -280,6 +311,18 @@ class AgentComponent(ToolCallingAgentComponent):
         tools = component_toolkit(component=self).get_tools(
             tool_name=self.get_tool_name(), tool_description=description, callbacks=self.get_langchain_callbacks()
         )
+        # Only mark the Stable Diffusion tool as return_direct
+        # print("I come to this agent(front)")
+        # for tool in tools:
+        #     # 1) Log the tool so you can inspect its attributes
+        #     print(f"[DEBUG] Found tool: name={tool.name}, tool_name={getattr(tool, 'tool_name', None)}, description={tool.description}")
+            
+        #     # 2) Match on whichever field uniquely identifies your image tool
+        #     if tool.name == "StableDiffusion-generate":
+        #         print('INSIE STABLE ')
+        #         setattr(tool, "return_direct", True)
+        #     else:
+        #         setattr(tool, "return_direct", False)
         if hasattr(self, "tools_metadata"):
             tools = component_toolkit(component=self, metadata=self.tools_metadata).update_tools_metadata(tools=tools)
         return tools

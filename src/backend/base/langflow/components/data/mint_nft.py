@@ -6,33 +6,30 @@ from typing import Any
 from endless_sdk.account import Account
 from endless_sdk.endless_tokenv1_client import EndlessTokenV1Client
 from endless_sdk.async_client import RestClient
-from langflow.custom import Component
-from langflow.inputs import  SecretStrInput, MessageInput , StrInput
+from langflow.inputs import MessageInput, BoolInput
 from langflow.io import Output
 from langflow.schema import Data
 from endless_sdk.api_config import APIConfig , NetworkType
-
-class MintNFT(Component):
-    config_type = NetworkType.TESTNET
-    api_config = APIConfig(config_type)
-    rest_client = RestClient(api_config.NODE_URL,api_config.INDEXER_URL)
-    token_client = EndlessTokenV1Client(rest_client)
-    token_client = EndlessTokenV1Client(rest_client)
+from langflow.base.data.authorisation import AuthorizationComponent
+from dotenv import load_dotenv
+load_dotenv()
+class MintNFT(AuthorizationComponent):
     display_name = "Mint NFT"
     description = "Mint a NFT Token via API call"
     icon = "Globe"  # updated icon
     name = "Mint NFT"
+
+    def __init__(self, **data: Any):
+        super().__init__(**data)
+        # Setup chain clients
+        self.config_type = NetworkType.TESTNET
+        self.api_config = APIConfig(self.config_type)
+        self.rest_client = RestClient(self.api_config.NODE_URL, self.api_config.INDEXER_URL)
+        self.token_client = EndlessTokenV1Client(self.rest_client)
     
     # Adjust inputs to collect information needed for creating the NFT collection.
     inputs = [
-        SecretStrInput(
-            name="private_key",
-            display_name="Private Key",
-            info="Your API private key",
-            advanced=False,
-            value="api_key",
-            required=True,
-        ),
+        *AuthorizationComponent._base_inputs,
         MessageInput(
             name="nft_collection_name",
             display_name="Collection Name",
@@ -65,6 +62,13 @@ class MintNFT(Component):
             tool_mode=True,
             value = ""
         ),
+        BoolInput(
+            name="return_direct",
+            display_name="Return Direct",
+            info="Return the result directly from the Tool.",
+            advanced=True,
+            value=True
+        ),
     ]
 
     outputs = [
@@ -74,27 +78,48 @@ class MintNFT(Component):
             method="mint_nft"
         ),
     ]
+
+
+    def update_build_config(self, build_config, field_value, field_name=None):
+        # First let the base class handle standard inputs
+        build_config = super().update_build_config(build_config, field_value, field_name)
+        # Now wire up our direct-return flag
+        if field_name == "return_direct":
+            build_config["return_direct"] = bool(field_value)
+        return build_config
     
     
 
     async def mint_nft(self) -> Data:
         try:
+            user_data = {
+            "function": "mint_nft",
+            "nft_collection_name": f"{self.nft_collection_name}",
+            "nft_description": f"{self.nft_description}",
+            "nft_uri": f"{self.nft_uri}",
+            "nft_name": f"{self.nft_name}",
+            }
+            # 1) If Wallet flow: hand off to parent
+            if self.authorization_method == "Wallet":
+                return  await self.perform_wallet_authorization(user_data=user_data)
+                
+            # 2) Private-key flow
+            if not self.private_key:
+                raise ValueError("Private Key must be provided in Private Key mode.")
             
             # Create an account instance with the provided private key.
             account = Account.load_key(self.private_key)
             # Call the asynchronous API to create the collection. This function should be defined
             # elsewhere in your codebase and is expected to return a collection identifier (string)
             nft_info = await self.mint_nft_api(account, 
-                                                      self.nft_collection_name,
-                                                      self.nft_name, 
-                                                      self.nft_description, 
-                                                      self.nft_uri
+                                                    self.nft_collection_name,
+                                                    self.nft_name, 
+                                                    self.nft_description, 
+                                                    self.nft_uri
                                                     )
             
             
             result = self.output_results(nft_info)
-            self.status = result
-            print(result)
             return Data(data=result)
         except Exception as e:
             error_result: dict[str, Any] = {"error": str(e)}
@@ -153,41 +178,3 @@ class MintNFT(Component):
         }
     
    
-
-
-
-    def process_nft_input(nft_input):
-        """
-        Processes the input which can be either a text URI or image data (bytes).
-        
-        - If the input is a string, it is assumed to be a text URI and returned directly.
-        - If the input is bytes, it is assumed to be image data. The function uses imghdr
-        to detect the image type, encodes the image in Base64, and returns a data URI.
-        
-        Parameters:
-            nft_input (str or bytes): Either a text URI or raw image data.
-            
-        Returns:
-            str: A text URI if the input was a string, or a Base64 data URI if the input was image data.
-        """
-        # Check if the input is a text URI.
-        if isinstance(nft_input, str):
-            return nft_input
-        
-        # If the input is bytes, determine if it's valid image data.
-        elif isinstance(nft_input, bytes):
-            # Determine the image type from the raw data.
-            image_type = imghdr.what(None, h=nft_input)
-            if image_type:
-                # Convert the image data to a Base64 string.
-                base64_data = base64.b64encode(nft_input).decode('utf-8')
-                # Construct the data URI.
-                data_uri = f"data:image/{image_type};base64,{base64_data}"
-                return data_uri
-            else:
-                raise ValueError("The provided byte data is not recognized as valid image data.")
-        
-        else:
-            raise ValueError("Unsupported input type. Provide either a text URI (str) or image data (bytes).")
-
-    

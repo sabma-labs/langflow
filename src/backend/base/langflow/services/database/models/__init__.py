@@ -5,5 +5,6 @@ from .message import MessageTable
 from .transactions import TransactionTable
 from .user import User
 from .variable import Variable
-
-__all__ = ["ApiKey", "Flow", "Folder", "MessageTable", "TransactionTable", "User", "Variable"]
+from .user_input import UserInput
+from .file import File
+__all__ = ["ApiKey", "Flow", "Folder", "MessageTable", "TransactionTable", "User", "Variable", 'UserInput','File']

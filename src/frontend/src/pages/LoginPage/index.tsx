@@ -74,8 +74,8 @@ export default function LoginPage(): JSX.Element {
       }
 
       const { signature, fullMessage, publicKey } = signatureResult.args;
-
-      const res = await fetch("http://localhost:7860/api/auth/wallet-login", {
+      const api = process.env.BACKEND_URL
+      const res = await fetch(`${api}/api/auth/wallet-login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
