@@ -13,9 +13,9 @@ Surrey x Endless Lab 旨在为处于 Endless 生态下的开发者提供一个�
 
 ## ⚙️ 核心功能 | Key Features
 
-Surrey x Endless Lab 基于开源工作流平台 [Langflow](https://github.com/logspace-ai/langflow) 打造，在保留 Langflow 所有基础功能的前提下，增强了与 Endless 平台和 Luffa 聊天应用的深度交互。
+Surrey x Endless Lab 被打造为集成 Endless 平台和 Luffa 聊天应用的工作流生成平台。
 
-Built on the open-source platform **Langflow**, Surrey x Endless Lab retains all the core features of Langflow while adding unique integrations with the Endless platform and Luffa chatbot ecosystem.
+Surrey x Endless Lab is designed as a workflow generation platform that integrates the Endless platform and the Luffa chat application.
 
 **主要功能包括 | Key features include:**
 
@@ -75,13 +75,3 @@ The current version of Surrey x Endless Lab is hosted by the Surrey Academy for 
 ![Langflow logo](./docs/static/img/preview1.png)
 ![Langflow logo](./docs/static/img/preview2.png)
 
-
-
-## 🙏 致谢 | Acknowledgements
-本项目基于开源项目 Langflow 进行开发与扩展，特此感谢其原始作者及社区对开源生态的贡献。Langflow 是一个由 Logspace 开发并在 MIT 许可下发布的可视化 LLM 工作流构建工具，提供了丰富的组件化架构与高度可扩展的框架，为本项目的实现提供了重要基础。
-
-我们在使用过程中遵循了其开源协议，并在此向 Langflow 社区致以诚挚的感谢。
-
-This project is developed and extended based on the open-source project Langflow. We would like to express our sincere appreciation to its original creators and the community for their valuable contributions to the open-source ecosystem. Langflow, developed by Logspace and released under the MIT License, is a visual LLM workflow builder offering a modular architecture and extensible framework, which served as a solid foundation for this work.
-
-We adhere to the terms of its open-source license and extend our gratitude to the Langflow community.
